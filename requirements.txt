@@ -1,5 +1,5 @@
 streamlit
 antspynet
 ants
-openai
+openai==0.28
 pydantic
