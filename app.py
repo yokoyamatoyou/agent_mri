@@ -38,7 +38,16 @@ def main():
 
         response = client.analyze_image(tmp_path, mask_path)
         os.remove(mask_path)
-        st.markdown(response.report)
+
+        # OpenAIから返ってきたレポートを表示
+        if response.is_finding_present:
+            st.markdown(f"**所見要約:** {response.finding_summary}")
+            st.markdown(f"**詳細説明:** {response.detailed_description}")
+            st.markdown(f"**推定部位:** {response.anatomical_location}")
+            st.markdown(f"**信頼度:** {response.confidence_score:.2f}")
+        else:
+            st.markdown("**所見:** 異常所見は検出されませんでした。")
+
         st.markdown("*本結果はAIによる補助情報であり、診断は専門医が行ってください*")
     except Exception as e:
         st.error(f"Processing failed: {e}")
