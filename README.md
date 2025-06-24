@@ -1,8 +1,12 @@
 # MRI Reading Assistant
 
-This project is an example MVP combining **ANTsPyNet** and **GPT-4.1**.  
+This project is an example MVP combining **ANTsPyNet** and **GPT-4.1**.
 It provides a simple Streamlit application to upload an MRI image, run brain
 extraction and request a textual report from OpenAI.
+
+On first execution ANTsPyNet downloads pretrained weights under
+`~/.antspynet/`.  Ensure the machine can access the internet when running
+the application for the first time.
 
 ## Setup
 
@@ -19,3 +23,6 @@ extraction and request a textual report from OpenAI.
    ```
 
 Unit tests can be executed with `pytest`.
+
+The results shown by the application are intended for assisting radiologists
+and do not constitute a medical diagnosis.
