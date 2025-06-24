@@ -6,7 +6,7 @@ import streamlit as st
 import ants
 
 from mri_app.image_utils import extract_brain, overlay_mask
-from mri_app.openai_client import OpenAIClient
+from mri_app.openai_client import get_openai_client
 
 
 def main():
@@ -30,7 +30,7 @@ def main():
         image, mask = result
         st.image(overlay_mask(image, mask), caption="Extracted brain")
 
-        client = OpenAIClient()
+        client = get_openai_client()
         st.info("Sending to GPT-4.1...")
         with tempfile.NamedTemporaryFile(delete=False, suffix=".nii.gz") as mtmp:
             ants.image_write(mask, mtmp.name)
@@ -39,6 +39,7 @@ def main():
         response = client.analyze_image(tmp_path, mask_path)
         os.remove(mask_path)
         st.markdown(response.report)
+        st.markdown("*本結果はAIによる補助情報であり、診断は専門医が行ってください*")
     except Exception as e:
         st.error(f"Processing failed: {e}")
     finally:

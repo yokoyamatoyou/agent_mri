@@ -5,6 +5,7 @@ import os
 from typing import Any
 
 import openai
+import streamlit as st
 from pydantic import BaseModel
 
 from .image_utils import is_supported_file
@@ -24,6 +25,7 @@ class OpenAIClient:
         if not key:
             raise ValueError(f"Environment variable {api_key_env} is not set")
         openai.api_key = key
+
 
     def analyze_image(self, image_path: str, mask_path: str | None = None) -> GPTReport:
         """Send an MRI image (and optional mask) to GPT and parse JSON report."""
@@ -66,3 +68,9 @@ class OpenAIClient:
             return GPTReport.model_validate(data)
         except Exception as e:
             raise ValueError(f"Invalid response format: {e}") from e
+
+
+@st.cache_resource
+def get_openai_client() -> OpenAIClient:
+    """Return cached ``OpenAIClient`` instance."""
+    return OpenAIClient()
