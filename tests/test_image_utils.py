@@ -6,6 +6,7 @@ import tempfile
 from mri_app import image_utils
 import numpy as np
 from PIL import Image
+import pytest
 
 
 class DummyImage:
@@ -78,3 +79,12 @@ def test_overlay_mask_custom_color():
 
     arr = image_utils.overlay_mask(img, mask, color=(0, 255, 0))
     assert (arr == [0, 255, 0]).all()
+
+
+def test_overlay_mask_shape_mismatch():
+    """overlay_mask should error when shapes differ."""
+    img = DummyImage(np.zeros((2, 2)))
+    mask = DummyImage(np.zeros((1, 1)))
+
+    with pytest.raises(ValueError):
+        image_utils.overlay_mask(img, mask)

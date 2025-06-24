@@ -106,16 +106,18 @@ def overlay_mask(image: "ants.ANTsImage", mask: "ants.ANTsImage", color: tuple[i
     np.ndarray
         RGB image array suitable for ``st.image``.
     """
-
     img_np = image.numpy().astype(float)
+    mask_np = mask.numpy() > 0
+
+    if img_np.shape != mask_np.shape:
+        raise ValueError("image and mask shapes do not match")
+
     img_np -= img_np.min()
     maxv = img_np.max()
     if maxv > 0:
         img_np /= maxv
     img_uint8 = (img_np * 255).astype(np.uint8)
     rgb = np.stack([img_uint8] * 3, axis=-1)
-
-    mask_np = mask.numpy() > 0
     for i, c in enumerate(color):
         rgb[..., i][mask_np] = c
 
