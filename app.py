@@ -5,7 +5,7 @@ import tempfile
 import streamlit as st
 import ants
 
-from mri_app.image_utils import extract_brain
+from mri_app.image_utils import extract_brain, overlay_mask
 from mri_app.openai_client import OpenAIClient
 
 
@@ -23,8 +23,12 @@ def main():
 
     try:
         st.info("Performing brain extraction...")
-        masked = extract_brain(tmp_path)
-        st.image(masked.numpy(), caption="Extracted brain")
+        result = extract_brain(tmp_path)
+        if result is None:
+            st.error("Brain extraction failed.")
+            return
+        image, mask = result
+        st.image(overlay_mask(image, mask), caption="Extracted brain")
 
         client = OpenAIClient()
         st.info("Sending to GPT-4.1...")

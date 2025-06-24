@@ -3,6 +3,18 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
 import tempfile
 from mri_app import image_utils
+import numpy as np
+
+
+class DummyImage:
+    def __init__(self, arr):
+        self._arr = np.array(arr)
+
+    def numpy(self):
+        return self._arr
+
+    def __mul__(self, other):
+        return DummyImage(self._arr * other._arr)
 
 
 def test_extract_brain_invalid_extension(monkeypatch):
@@ -19,3 +31,28 @@ def test_extract_brain_handles_error(monkeypatch):
     with tempfile.NamedTemporaryFile(suffix='.nii') as tmp:
         result = image_utils.extract_brain(tmp.name)
         assert result is None
+
+
+def test_extract_brain_success(monkeypatch):
+    img = DummyImage(np.ones((2, 2)))
+    mask = DummyImage([[1, 0], [0, 1]])
+
+    monkeypatch.setattr(image_utils.ants, "image_read", lambda p: img)
+    monkeypatch.setattr(image_utils, "brain_extraction", lambda x: mask)
+
+    with tempfile.NamedTemporaryFile(suffix=".nii") as tmp:
+        res = image_utils.extract_brain(tmp.name)
+        assert isinstance(res, tuple)
+        assert res[0] is img
+        assert res[1] is mask
+
+
+def test_overlay_mask(monkeypatch):
+    img = DummyImage(np.zeros((2, 2)))
+    mask = DummyImage([[0, 1], [0, 0]])
+
+    arr = image_utils.overlay_mask(img, mask)
+    assert arr.shape == (2, 2, 3)
+    assert arr[0, 1, 0] == 255
+    assert arr[0, 1, 1] == 0
+    assert arr[0, 1, 2] == 0
