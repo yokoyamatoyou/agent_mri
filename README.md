@@ -14,8 +14,9 @@ the application for the first time.
    ```bash
    pip install -r requirements.txt
    ```
-2. Prepare environment variables.  Copy `.env.example` and set your
-   `OPENAI_API_KEY`.
+2. Prepare environment variables.  Copy `.env.example` to `.env` and set your
+   `OPENAI_API_KEY`.  The application automatically loads this file via
+   `python-dotenv`.
 
 3. Launch the application
    ```bash
