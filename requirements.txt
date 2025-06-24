@@ -4,3 +4,4 @@ ants
 openai==0.28
 pydantic
 numpy
+python-dotenv

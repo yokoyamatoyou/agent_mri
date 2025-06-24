@@ -36,7 +36,13 @@ def main():
         with img_col:
             st.image(overlay_mask(image, mask), caption="Extracted brain")
 
-        client = get_openai_client()
+        try:
+            client = get_openai_client()
+        except ValueError:
+            st.error(
+                "APIキーが見つかりません。環境変数OPENAI_API_KEYを設定してください。"
+            )
+            return
         st.info("Sending to GPT-4.1...")
         with tempfile.NamedTemporaryFile(delete=False, suffix=".nii.gz") as mtmp:
             ants.image_write(mask, mtmp.name)
