@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class ANTsImage:
     def __mul__(self, other):
         return self

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class BaseModel:
     def __init__(self, **data):
         for field in self.__annotations__:

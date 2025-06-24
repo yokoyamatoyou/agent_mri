@@ -1,8 +1,20 @@
+# -*- coding: utf-8 -*-
 """Utilities for MRI image analysis using ANTsPyNet."""
 
-import ants
 import streamlit as st
-from antspynet.utilities import brain_extraction
+
+try:  # heavy deps may be missing in the test environment
+    import ants
+except Exception:  # pragma: no cover - optional dependency
+    class _DummyAnts:
+        pass
+
+    ants = _DummyAnts()
+
+try:  # antspynet is optional during unit tests
+    from antspynet.utilities import brain_extraction
+except Exception:  # pragma: no cover - optional dependency
+    brain_extraction = None
 from pathlib import Path
 from typing import Tuple
 import numpy as np
@@ -45,10 +57,12 @@ def _get_brain_extractor():
 
     Caching avoids re-loading heavy model weights on every rerun.
     """
+    if brain_extraction is None:
+        raise ImportError("antspynet is not available")
     return brain_extraction
 
 
-def extract_brain(image_path: str) -> Tuple[ants.ANTsImage, ants.ANTsImage] | None:
+def extract_brain(image_path: str) -> Tuple["ants.ANTsImage", "ants.ANTsImage"] | None:
     """Run brain extraction and return image and mask.
 
     Parameters
@@ -58,7 +72,7 @@ def extract_brain(image_path: str) -> Tuple[ants.ANTsImage, ants.ANTsImage] | No
 
     Returns
     -------
-    Tuple[ants.ANTsImage, ants.ANTsImage] | None
+    Tuple["ants.ANTsImage", "ants.ANTsImage"] | None
         Tuple of original image and mask or ``None`` if extraction failed.
     """
 
@@ -75,7 +89,7 @@ def extract_brain(image_path: str) -> Tuple[ants.ANTsImage, ants.ANTsImage] | No
     return img, mask
 
 
-def overlay_mask(image: ants.ANTsImage, mask: ants.ANTsImage, color: tuple[int, int, int] = (255, 0, 0)) -> np.ndarray:
+def overlay_mask(image: "ants.ANTsImage", mask: "ants.ANTsImage", color: tuple[int, int, int] = (255, 0, 0)) -> np.ndarray:
     """Return RGB array of ``image`` with ``mask`` overlaid.
 
     Parameters
