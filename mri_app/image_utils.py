@@ -1,6 +1,7 @@
 """Utilities for MRI image analysis using ANTsPyNet."""
 
 import ants
+import streamlit as st
 from antspynet.utilities import brain_extraction
 from pathlib import Path
 from typing import Tuple
@@ -14,6 +15,15 @@ def is_supported_file(path: str) -> bool:
     if ext == ".gz":
         ext = Path(path).with_suffix("").suffix.lower() + ".gz"
     return ext in _ALLOWED_EXTS
+
+
+@st.cache_resource
+def _get_brain_extractor():
+    """Return the ANTsPyNet ``brain_extraction`` function.
+
+    Caching avoids re-loading heavy model weights on every rerun.
+    """
+    return brain_extraction
 
 
 def extract_brain(image_path: str) -> Tuple[ants.ANTsImage, ants.ANTsImage] | None:
@@ -35,7 +45,8 @@ def extract_brain(image_path: str) -> Tuple[ants.ANTsImage, ants.ANTsImage] | No
 
     try:
         img = ants.image_read(image_path)
-        mask = brain_extraction(img)
+        brain_extractor = _get_brain_extractor()
+        mask = brain_extractor(img)
     except Exception:
         return None
 
