@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Minimal stub of Streamlit for testing purposes.
 
 This module provides just enough of the :mod:`streamlit` API for the unit tests

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 api_key = None
 
 class ChatCompletion:
