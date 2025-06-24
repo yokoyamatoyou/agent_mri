@@ -47,7 +47,7 @@ def test_extract_brain_success(monkeypatch):
         assert res[1] is mask
 
 
-def test_overlay_mask(monkeypatch):
+def test_overlay_mask():
     img = DummyImage(np.zeros((2, 2)))
     mask = DummyImage([[0, 1], [0, 0]])
 
@@ -56,3 +56,12 @@ def test_overlay_mask(monkeypatch):
     assert arr[0, 1, 0] == 255
     assert arr[0, 1, 1] == 0
     assert arr[0, 1, 2] == 0
+
+
+def test_overlay_mask_custom_color():
+    """overlay_mask should honor the given color tuple."""
+    img = DummyImage(np.zeros((1, 1)))
+    mask = DummyImage([[1]])
+
+    arr = image_utils.overlay_mask(img, mask, color=(0, 255, 0))
+    assert (arr == [0, 255, 0]).all()

@@ -53,6 +53,13 @@ def test_parse_report_helper():
     assert report.is_finding_present is True
 
 
+def test_parse_report_missing_key():
+    """parse_report should fail when required keys are missing."""
+    text = json.dumps({"confidence_score": 0.1})
+    with pytest.raises(ValueError):
+        OpenAIClient.parse_report(text)
+
+
 def test_invalid_json(monkeypatch):
     dummy = DummyResponse({"choices": [{"message": {"content": "not-json"}}]})
 
@@ -96,3 +103,10 @@ def test_file_not_found(monkeypatch):
     client = OpenAIClient()
     with pytest.raises(FileNotFoundError):
         client.analyze_image("/nonexistent/path.nii")
+
+
+def test_missing_api_key(monkeypatch):
+    """OpenAIClient should raise when API key env var is missing."""
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    with pytest.raises(ValueError):
+        OpenAIClient()

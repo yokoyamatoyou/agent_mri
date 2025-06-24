@@ -75,7 +75,10 @@ class OpenAIClient:
 
         try:
             data: Any = json.loads(text)
-            return GPTReport.model_validate(data)
+            report = GPTReport.model_validate(data)
+            if report.is_finding_present is None or report.confidence_score is None:
+                raise ValueError("Missing required fields")
+            return report
         except Exception as e:
             raise ValueError(f"Invalid response format: {e}") from e
 
