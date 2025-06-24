@@ -6,15 +6,37 @@ from antspynet.utilities import brain_extraction
 from pathlib import Path
 from typing import Tuple
 import numpy as np
+from PIL import Image
 
 _ALLOWED_EXTS = {".nii", ".nii.gz", ".png", ".jpg", ".jpeg"}
 
 def is_supported_file(path: str) -> bool:
-    """Return ``True`` if ``path`` has a supported medical image extension."""
+    """Return ``True`` if ``path`` has a supported medical image extension.
+
+    In addition to the file extension, basic header checks are performed for
+    common image formats (PNG/JPEG).  This guards against users renaming an
+    unsupported file with a valid extension.
+    """
+
     ext = Path(path).suffix.lower()
     if ext == ".gz":
         ext = Path(path).with_suffix("").suffix.lower() + ".gz"
-    return ext in _ALLOWED_EXTS
+
+    if ext not in _ALLOWED_EXTS:
+        return False
+
+    if ext in {".png", ".jpg", ".jpeg"}:
+        # Verify the image header using Pillow. ``Image.open`` will raise an
+        # exception if the file does not contain a valid image of the expected
+        # type. ``verify`` avoids loading the full image into memory.
+        try:
+            with Image.open(path) as im:
+                im.verify()
+            return True
+        except Exception:
+            return False
+
+    return True
 
 
 @st.cache_resource
