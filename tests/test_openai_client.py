@@ -29,8 +29,9 @@ def test_parse_valid_response(monkeypatch):
     monkeypatch.setattr("openai.ChatCompletion.create", fake_create)
 
     client = OpenAIClient()
-    with tempfile.NamedTemporaryFile(suffix=".nii") as tmp:
-        report = client.analyze_image(tmp.name)
+    with tempfile.NamedTemporaryFile(suffix=".nii") as tmp1, \
+         tempfile.NamedTemporaryFile(suffix=".nii") as tmp2:
+        report = client.analyze_image(tmp1.name, tmp2.name)
 
     assert isinstance(report, GPTReport)
     assert report.is_finding_present is False
@@ -46,9 +47,10 @@ def test_invalid_json(monkeypatch):
     monkeypatch.setattr("openai.ChatCompletion.create", fake_create)
 
     client = OpenAIClient()
-    with tempfile.NamedTemporaryFile(suffix=".nii") as tmp:
+    with tempfile.NamedTemporaryFile(suffix=".nii") as tmp1, \
+         tempfile.NamedTemporaryFile(suffix=".nii") as tmp2:
         with pytest.raises(ValueError):
-            client.analyze_image(tmp.name)
+            client.analyze_image(tmp1.name, tmp2.name)
 
 
 def test_api_error(monkeypatch):
@@ -59,9 +61,10 @@ def test_api_error(monkeypatch):
     monkeypatch.setattr("openai.ChatCompletion.create", fake_create)
 
     client = OpenAIClient()
-    with tempfile.NamedTemporaryFile(suffix=".nii") as tmp:
+    with tempfile.NamedTemporaryFile(suffix=".nii") as tmp1, \
+         tempfile.NamedTemporaryFile(suffix=".nii") as tmp2:
         with pytest.raises(RuntimeError):
-            client.analyze_image(tmp.name)
+            client.analyze_image(tmp1.name, tmp2.name)
 
 
 def test_unsupported_extension(monkeypatch):
