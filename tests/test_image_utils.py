@@ -4,6 +4,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import tempfile
 from mri_app import image_utils
 import numpy as np
+from PIL import Image
 
 
 class DummyImage:
@@ -15,6 +16,17 @@ class DummyImage:
 
     def __mul__(self, other):
         return DummyImage(self._arr * other._arr)
+
+
+def test_is_supported_file_header_check(tmp_path):
+    """Files renamed to an allowed extension should be detected."""
+    fake = tmp_path / "bad.jpg"
+    fake.write_bytes(b"not an image")
+    assert image_utils.is_supported_file(str(fake)) is False
+
+    good = tmp_path / "good.png"
+    Image.new("RGB", (1, 1)).save(good)
+    assert image_utils.is_supported_file(str(good)) is True
 
 
 def test_extract_brain_invalid_extension(monkeypatch):
