@@ -48,6 +48,13 @@ def main():
         else:
             st.markdown("**所見:** 異常所見は検出されませんでした。")
 
+        st.download_button(
+            label="Download JSON",
+            data=response.to_json(),
+            file_name="report.json",
+            mime="application/json",
+        )
+
         st.markdown("*本結果はAIによる補助情報であり、診断は専門医が行ってください*")
     except Exception as e:
         st.error(f"Processing failed: {e}")

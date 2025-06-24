@@ -53,6 +53,20 @@ def test_parse_report_helper():
     assert report.is_finding_present is True
 
 
+def test_report_to_json():
+    """GPTReport should serialize to JSON string."""
+
+    report = GPTReport(
+        is_finding_present=True,
+        finding_summary="s",
+        detailed_description="d",
+        confidence_score=0.7,
+        anatomical_location="brain",
+    )
+    data = json.loads(report.to_json())
+    assert data["is_finding_present"] is True
+
+
 def test_parse_report_missing_key():
     """parse_report should fail when required keys are missing."""
     text = json.dumps({"confidence_score": 0.1})

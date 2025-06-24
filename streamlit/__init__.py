@@ -20,6 +20,7 @@ __all__ = [
     "warning",
     "success",
     "write",
+    "download_button",
     "spinner",
     "session_state",
 ]
@@ -76,6 +77,11 @@ def success(*args, **kwargs):
 
 
 def write(*args, **kwargs):
+    return None
+
+
+def download_button(*args, **kwargs):
+    """Return ``None`` for ``st.download_button`` in tests."""
     return None
 
 
