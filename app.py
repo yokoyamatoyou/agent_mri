@@ -32,7 +32,12 @@ def main():
 
         client = OpenAIClient()
         st.info("Sending to GPT-4.1...")
-        response = client.analyze_image(tmp_path)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".nii.gz") as mtmp:
+            ants.image_write(mask, mtmp.name)
+            mask_path = mtmp.name
+
+        response = client.analyze_image(tmp_path, mask_path)
+        os.remove(mask_path)
         st.markdown(response.report)
     except Exception as e:
         st.error(f"Processing failed: {e}")

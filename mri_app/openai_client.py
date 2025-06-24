@@ -25,8 +25,8 @@ class OpenAIClient:
             raise ValueError(f"Environment variable {api_key_env} is not set")
         openai.api_key = key
 
-    def analyze_image(self, image_path: str) -> GPTReport:
-        """Send an MRI image to GPT and parse JSON report."""
+    def analyze_image(self, image_path: str, mask_path: str | None = None) -> GPTReport:
+        """Send an MRI image (and optional mask) to GPT and parse JSON report."""
 
         if not os.path.isfile(image_path):
             raise FileNotFoundError(image_path)
@@ -34,18 +34,31 @@ class OpenAIClient:
         if not is_supported_file(image_path):
             raise ValueError(f"Unsupported file type: {image_path}")
 
+        files = []
         try:
-            with open(image_path, "rb") as f:
-                response = openai.ChatCompletion.create(
-                    model="gpt-4-vision-preview",
-                    messages=[
-                        {"role": "system", "content": "You are a radiology assistant."},
-                        {"role": "user", "content": "Analyze this MRI image and reply in JSON."},
-                    ],
-                    files=[{"file": f}],
-                )
+            img_f = open(image_path, "rb")
+            files.append({"file": img_f})
+            if mask_path is not None:
+                if not os.path.isfile(mask_path):
+                    raise FileNotFoundError(mask_path)
+                if not is_supported_file(mask_path):
+                    raise ValueError(f"Unsupported file type: {mask_path}")
+                mask_f = open(mask_path, "rb")
+                files.append({"file": mask_f})
+
+            response = openai.ChatCompletion.create(
+                model="gpt-4-vision-preview",
+                messages=[
+                    {"role": "system", "content": "You are a radiology assistant."},
+                    {"role": "user", "content": "Analyze these MRI images and reply in JSON."},
+                ],
+                files=files,
+            )
         except Exception as e:
             raise RuntimeError(f"OpenAI API call failed: {e}") from e
+        finally:
+            for f in files:
+                f["file"].close()
 
         try:
             content: str = response["choices"][0]["message"]["content"]
