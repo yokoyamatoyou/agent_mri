@@ -22,6 +22,9 @@ the application for the first time.
    streamlit run app.py
    ```
 
+After processing an image the app shows the extracted brain, textual findings
+and offers a **Download JSON** button to save the structured report.
+
 Unit tests can be executed with `pytest`.
 
 The results shown by the application are intended for assisting radiologists

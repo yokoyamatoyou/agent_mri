@@ -19,6 +19,10 @@ class GPTReport(BaseModel):
     confidence_score: float
     anatomical_location: str | None = None
 
+    def to_json(self) -> str:
+        """Return the report as a JSON string."""
+        return self.model_dump_json(ensure_ascii=False)
+
 class OpenAIClient:
     def __init__(self, api_key_env: str = "OPENAI_API_KEY"):
         key = os.getenv(api_key_env)
