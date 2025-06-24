@@ -37,6 +37,22 @@ def test_parse_valid_response(monkeypatch):
     assert report.is_finding_present is False
 
 
+def test_parse_report_helper():
+    """Ensure ``parse_report`` converts JSON text to ``GPTReport``."""
+
+    text = json.dumps({
+        "is_finding_present": True,
+        "finding_summary": "dummy",
+        "detailed_description": "desc",
+        "confidence_score": 0.5,
+        "anatomical_location": "brain",
+    })
+
+    report = OpenAIClient.parse_report(text)
+    assert isinstance(report, GPTReport)
+    assert report.is_finding_present is True
+
+
 def test_invalid_json(monkeypatch):
     dummy = DummyResponse({"choices": [{"message": {"content": "not-json"}}]})
 

@@ -64,7 +64,17 @@ class OpenAIClient:
 
         try:
             content: str = response["choices"][0]["message"]["content"]
-            data: Any = json.loads(content)
+        except Exception as e:
+            raise RuntimeError(f"Malformed OpenAI response: {e}") from e
+
+        return self.parse_report(content)
+
+    @staticmethod
+    def parse_report(text: str) -> GPTReport:
+        """Parse JSON string ``text`` and return ``GPTReport``."""
+
+        try:
+            data: Any = json.loads(text)
             return GPTReport.model_validate(data)
         except Exception as e:
             raise ValueError(f"Invalid response format: {e}") from e
