@@ -3,3 +3,4 @@ antspynet
 ants
 openai==0.28
 pydantic
+numpy
