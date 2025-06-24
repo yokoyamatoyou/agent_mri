@@ -7,7 +7,7 @@ from pathlib import Path
 _ALLOWED_EXTS = {".nii", ".nii.gz", ".png", ".jpg", ".jpeg"}
 
 def is_supported_file(path: str) -> bool:
-    """Return ``True`` if file has a supported extension."""
+    """Return ``True`` if ``path`` has a supported medical image extension."""
     ext = Path(path).suffix.lower()
     if ext == ".gz":
         ext = Path(path).with_suffix("").suffix.lower() + ".gz"

@@ -49,3 +49,31 @@ def test_invalid_json(monkeypatch):
     with tempfile.NamedTemporaryFile(suffix=".nii") as tmp:
         with pytest.raises(ValueError):
             client.analyze_image(tmp.name)
+
+
+def test_api_error(monkeypatch):
+    def fake_create(*args, **kwargs):
+        raise RuntimeError("api down")
+
+    monkeypatch.setenv("OPENAI_API_KEY", "dummy")
+    monkeypatch.setattr("openai.ChatCompletion.create", fake_create)
+
+    client = OpenAIClient()
+    with tempfile.NamedTemporaryFile(suffix=".nii") as tmp:
+        with pytest.raises(RuntimeError):
+            client.analyze_image(tmp.name)
+
+
+def test_unsupported_extension(monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "dummy")
+    client = OpenAIClient()
+    with tempfile.NamedTemporaryFile(suffix=".txt") as tmp:
+        with pytest.raises(ValueError):
+            client.analyze_image(tmp.name)
+
+
+def test_file_not_found(monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "dummy")
+    client = OpenAIClient()
+    with pytest.raises(FileNotFoundError):
+        client.analyze_image("/nonexistent/path.nii")

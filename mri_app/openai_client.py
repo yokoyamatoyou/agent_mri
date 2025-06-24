@@ -7,6 +7,8 @@ from typing import Any
 import openai
 from pydantic import BaseModel
 
+from .image_utils import is_supported_file
+
 class GPTReport(BaseModel):
     """Structured response from GPT."""
 
@@ -25,6 +27,12 @@ class OpenAIClient:
 
     def analyze_image(self, image_path: str) -> GPTReport:
         """Send an MRI image to GPT and parse JSON report."""
+
+        if not os.path.isfile(image_path):
+            raise FileNotFoundError(image_path)
+
+        if not is_supported_file(image_path):
+            raise ValueError(f"Unsupported file type: {image_path}")
 
         try:
             with open(image_path, "rb") as f:
